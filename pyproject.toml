@@ -8,6 +8,7 @@ authors = ["Adam Blanchet <ab59@sanger.ac.uk>"]
 python = "^3.10"
 fastapi = "^0.75"
 uvicorn = "^0.17"
+ml-warehouse = { git = "https://github.com/wtsi-npg/ml-warehouse-python.git", branch="devel" }
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
