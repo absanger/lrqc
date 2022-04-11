@@ -9,6 +9,7 @@ python = "^3.10"
 fastapi = "^0.75"
 uvicorn = "^0.17"
 ml-warehouse = { git = "https://github.com/wtsi-npg/ml-warehouse-python.git", branch="devel" }
+SQLAlchemy = "^1.4.35"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
