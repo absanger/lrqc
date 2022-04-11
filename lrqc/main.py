@@ -10,7 +10,7 @@ app = FastAPI()
 
 
 @app.get("/")
-async def root() -> List[PacBioRun]:
+async def root():
     return {"message": "Hello world"}
 
 
