@@ -12,23 +12,10 @@ def get_run_by_name_and_label(
 ) -> Optional[PacBioRun]:
     """Get a PacBioRun by run_name and well_label."""
 
-    stmt = select(
-        PacBioRunWellMetrics.pac_bio_run_name,
-        PacBioRunWellMetrics.well_label,
-        PacBioRunWellMetrics.well_complete,
-    ).filter(
+    stmt = select(PacBioRunWellMetrics).filter(
         (PacBioRunWellMetrics.well_label == well_label)
         & (PacBioRunWellMetrics.pac_bio_run_name == run_name)
     )
 
     # pac_bio_run_name and well_label act as composite key so there is at most one result
-    run: Optional[PacBioRunWellMetrics] = session.execute(stmt).first()
-
-    if run is not None:
-        return PacBioRun(
-            name=run.pac_bio_run_name,
-            well_label=run.well_label,
-            well_complete=run.well_complete,
-        )
-
-    return None
+    return session.execute(stmt).scalars().first()

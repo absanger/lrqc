@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 
 class PacBioRun(BaseModel):
-    name: str = Field(
+    pac_bio_run_name: str = Field(
         default=None,
         title="Run Name",
         description="Lims specific identifier for the pacbio run",
@@ -16,3 +16,6 @@ class PacBioRun(BaseModel):
     well_complete: date = Field(
         default=None, title="Well Complete", description="Timestamp of well complete"
     )
+
+    class Config:
+        orm_mode = True
