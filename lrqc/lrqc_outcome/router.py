@@ -1,9 +1,5 @@
-from typing import List, Dict, Optional
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from fastapi import APIRouter
 
-from lrqc.lrqc_outcome.models import Annotation, QcOutcome
-from lrqc.lrqc_outcome.db.connection import lrqc_session_factory
 from lrqc.lrqc_outcome.endpoints.annotations import router as annotations_router
 from lrqc.lrqc_outcome.endpoints.qc_outcomes import router as qc_outcome_router
 
