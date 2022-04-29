@@ -16,3 +16,12 @@ if config["LQRC_DB_URL"] is None or config["LQRC_DB_URL"] == "":
 # engine = create_engine(config["LQRC_DB_URL"])
 engine = create_engine("sqlite+pysqlite:///test.db")
 lrqc_session_factory: sessionmaker = sessionmaker(engine, expire_on_commit=False)
+
+def get_lrqc_db():
+    """Get LRQC DB connection."""
+    db = lrqc_session_factory()
+    try:
+        yield db
+    finally:
+        db.close()
+

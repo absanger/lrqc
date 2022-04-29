@@ -1,13 +1,16 @@
 from typing import List, Optional
 from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlalchemy.orm import Session
+from starlette.responses import RedirectResponse
 
 from lrqc.db.models import PacBioRun
 from lrqc.db.run import get_run_by_name_and_label
 from lrqc.db.list import list_ten_recent_runs
 from lrqc.db.connection import session_factory
+from lrqc.lrqc_outcome.router import router as lrqc_router
 
 app = FastAPI()
+app.include_router(lrqc_router)
 
 
 def get_db():
@@ -21,7 +24,7 @@ def get_db():
 
 @app.get("/")
 async def root():
-    return {"message": "Hello world"}
+    return RedirectResponse(url="/docs")
 
 
 @app.get("/list", response_model=List[PacBioRun])
