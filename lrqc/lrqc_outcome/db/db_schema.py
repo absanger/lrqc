@@ -16,7 +16,8 @@ class Entity(Base):
     description_sha = Column(
         String(64),
         unique=True,
-        comment="sha256 of the description string (see 'pacbio_ent') or an ordered list of description strings",
+        comment="sha256 of the description string (see 'pacbio_ent') or an ordered list of "
+                "description strings",
     )
     description = Column(
         String(),
@@ -43,7 +44,8 @@ class PacbioEnt(Base):
     tag1_sequence = Column(String(), nullable=True)
     description = Column(
         String(),
-        comment="A human-readable unique string listing the four attributes in the order they are presented here.",
+        comment="A human-readable unique string listing the four attributes in the order they are"
+                " presented here.",
     )
 
 
