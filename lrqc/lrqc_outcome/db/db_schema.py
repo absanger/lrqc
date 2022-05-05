@@ -1,5 +1,6 @@
 from sqlalchemy import JSON, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.sql import func
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -34,6 +35,10 @@ class Entity(Base):
     qc_outcome = relationship("QcOutcome", back_populates="entity", uselist=False)
     qc_outcome_history = relationship("QcOutcomeHistory", back_populates="entity")
 
+    pacbio_entities = relationship(
+        "PacbioEnt", secondary="entity_pacbio_ent", back_populates="entity"
+    )
+
 
 class PacbioEnt(Base):
     __tablename__ = "pacbio_ent"
@@ -48,32 +53,42 @@ class PacbioEnt(Base):
         " presented here.",
     )
 
+    entity = relationship(
+        "Entity",
+        secondary="entity_pacbio_ent",
+        back_populates="pacbio_entities",
+        uselist=False,
+    )
+
 
 class EntityPacbioEnt(Base):
     __tablename__ = "entity_pacbio_ent"
 
     id_entity_pacbio_ent = Column(Integer, primary_key=True)
-    id_entity = Column(String(), comment="Foreign key, see 'entity'")
-    # TODO: make foreign key
-    id_pacbio_ent = Column(String(), comment="Foreign key, see 'pacbio_ent'")
+    id_entity = Column(
+        String(), ForeignKey("entity.id_entity"), comment="Foreign key, see 'entity'"
+    )
+    id_pacbio_ent = Column(
+        String(),
+        ForeignKey("pacbio_ent.id_pacbio_ent"),
+        comment="Foreign key, see 'pacbio_ent'",
+    )
 
 
 class QcOutcome(Base):
     __tablename__ = "qc_outcome"
 
     id_qc_outcome = Column(Integer, primary_key=True)
-    # TODO: make foreign key
     id_entity = Column(
         Integer, ForeignKey("entity.id_entity"), comment="Foreign key, see 'entity'"
     )
-    # TODO: make foreign key
     id_qc_outcome_dict = Column(
         Integer,
         ForeignKey("qc_outcome_dict.id_qc_outcome_dict"),
         comment="Foreign key, see 'qc_outcome_dict'",
     )
-    date_created = Column(DateTime)
-    date_updated = Column(DateTime)
+    date_created = Column(DateTime, server_default=func.now())
+    date_updated = Column(DateTime, server_default=func.now(), onupdate=func.now())
     user_name = Column(
         String(),
         comment="Real logged user, the user running a script or an agent (a pipeline)",
@@ -83,6 +98,12 @@ class QcOutcome(Base):
     entity = relationship("Entity", back_populates="qc_outcome", uselist=False)
     qc_outcome_dict = relationship(
         "QcOutcomeDict", back_populates="qc_outcome", uselist=False
+    )
+    linked_annotation = relationship(
+        "Annotation",
+        secondary="entity_annotation",
+        back_populates="linked_qc_outcome",
+        uselist=False,
     )
 
 
@@ -115,8 +136,8 @@ class QcOutcomeHistory(Base):
         ForeignKey("qc_outcome_dict.id_qc_outcome_dict"),
         comment="Foreign key, see 'qc_outcome_dict'",
     )
-    date_created = Column(DateTime)
-    date_updated = Column(DateTime)
+    date_created = Column(DateTime, server_default=func.now())
+    date_updated = Column(DateTime, server_default=func.now(), onupdate=func.now())
     user_name = Column(
         String(),
         comment="Real logged user, the user running a script or an agent (a pipeline)",
@@ -138,10 +159,20 @@ class Annotation(Base):
         String(),
         comment="Real logged user the user running a script or an agent (a pipeline)",
     )
-    date_created = Column(DateTime, comment="Date and time the annotation was created")
+    date_created = Column(
+        DateTime,
+        server_default=func.now(),
+        comment="Date and time the annotation was created",
+    )
 
     entities = relationship(
         "Entity", secondary="entity_annotation", back_populates="annotations"
+    )
+    linked_qc_outcome = relationship(
+        "QcOutcome",
+        secondary="entity_annotation",
+        back_populates="linked_annotation",
+        uselist=False,
     )
 
 
