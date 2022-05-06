@@ -5,7 +5,7 @@ description = "FastAPI application for Long Read QC"
 authors = ["Adam Blanchet <ab59@sanger.ac.uk>"]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.9"
 fastapi = "^0.75"
 uvicorn = "^0.17"
 ml-warehouse = { git = "https://github.com/wtsi-npg/ml-warehouse-python.git", branch="devel" }
