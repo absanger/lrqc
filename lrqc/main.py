@@ -15,6 +15,7 @@ app = FastAPI()
 app.include_router(lrqc_router)
 app.include_router(inbox_router)
 
+
 def get_db():
     """Get DB connection."""
     db = session_factory()
@@ -30,7 +31,7 @@ async def root():
 
 
 @app.get("/list", response_model=List[PacBioRun])
-def list(db: Session = Depends(get_db)) -> List[PacBioRun]:
+def list_ten_runs(db: Session = Depends(get_db)) -> List[PacBioRun]:
     """List the 10 most recent runs."""
     return list_ten_recent_runs(db)
 

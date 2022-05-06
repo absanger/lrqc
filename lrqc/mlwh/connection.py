@@ -13,6 +13,7 @@ if config["DB_URL"] is None or config["DB_URL"] == "":
 engine = create_engine(config["DB_URL"], future=True, echo=True)
 session_factory: sessionmaker = sessionmaker(engine, expire_on_commit=False)
 
+
 def get_mlwh_db() -> Session:
     """Get MLWH DB connection"""
     db = session_factory()
