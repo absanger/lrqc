@@ -22,14 +22,16 @@ jobs:
         with:
           python-version: '3.10'
           architecture: 'x64'
-          cache: 'poetry'
+
       
       - name: Run poetry install
         run: |
+          poetry env use python3.10
           poetry install
 
       - name: Check formatting with Black
         run: |
+          poetry run python --version
           poetry run black --check --diff --color .
 
       - name: Run flake8
