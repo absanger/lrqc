@@ -21,10 +21,11 @@ jobs:
         with:
           python-version: '3.10'
           architecture: 'x64'
-          cache: 'poetry'
+          # cache: 'poetry'
 
       - name: Run poetry install
         run: |
+          poetry env use '3.10'
           poetry install
         
       - name: Build openapi.json
