@@ -4,7 +4,7 @@ from typing import Optional
 from pytest import Session
 from ml_warehouse.schema import PacBioRunWellMetrics
 from sqlalchemy import select
-from lrqc.db.models import PacBioRun
+from lrqc.mlwh.models import PacBioRun
 
 
 def get_run_by_name_and_label(

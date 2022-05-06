@@ -3,15 +3,17 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlalchemy.orm import Session
 from starlette.responses import RedirectResponse
 
-from lrqc.db.models import PacBioRun
-from lrqc.db.run import get_run_by_name_and_label
-from lrqc.db.list import list_ten_recent_runs
-from lrqc.db.connection import session_factory
+from lrqc.mlwh.models import PacBioRun
+from lrqc.mlwh.run import get_run_by_name_and_label
+from lrqc.mlwh.list import list_ten_recent_runs
+from lrqc.mlwh.connection import session_factory
 from lrqc.lrqc_outcome.router import router as lrqc_router
+from lrqc.mlwh.endpoints.inbox import router as inbox_router
+
 
 app = FastAPI()
 app.include_router(lrqc_router)
-
+app.include_router(inbox_router)
 
 def get_db():
     """Get DB connection."""

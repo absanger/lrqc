@@ -6,7 +6,7 @@ from ml_warehouse.schema import PacBioRunWellMetrics
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from lrqc.db.models import PacBioRun
+from lrqc.mlwh.models import PacBioRun
 
 
 def list_ten_recent_runs(session: Session) -> List[PacBioRun]:
