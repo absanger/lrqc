@@ -62,7 +62,6 @@ mypy-extensions = ">=0.4.3"
 pathspec = ">=0.9.0"
 platformdirs = ">=2"
 tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
-typing-extensions = {version = ">=3.10.0.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
 colorama = ["colorama (>=0.4.3)"]
@@ -478,8 +477,8 @@ standard = ["websockets (>=10.0)", "httptools (>=0.4.0)", "watchgod (>=0.6)", "p
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.9"
-content-hash = "8d8f93e6686e1eefc68d8de8769c561e24e3f2cc07437ecc1f0c7c6eda15b1d0"
+python-versions = "^3.10"
+content-hash = "ed37dc73ddd60b73b81bfdeb038054f546be9266b1a2c49823935a58ed5dd32d"
 
 [metadata.files]
 anyio = [
