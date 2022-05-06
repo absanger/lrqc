@@ -30,6 +30,7 @@ jobs:
 
       - name: Check formatting with Black
         run: |
+          poetry run python --version
           poetry run black --check --diff --color .
 
       - name: Run flake8
