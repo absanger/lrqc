@@ -1,8 +1,9 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from lrqc.lrqc_outcome.models import (
     QcOutcomeOut,
@@ -23,7 +24,14 @@ from lrqc.lrqc_outcome.endpoints.misc import get_or_create, get_entities_pacbio
 router = APIRouter()
 
 
-@router.post("/create")
+@router.post(
+    "/create",
+    responses={
+        400: {
+            "description": "Bad Request. QC outcome probably violates DB constraints."
+        }
+    },
+)
 def create_qc_outcome(
     pacbio_entity: PacBioSearch,
     qc_outcome: QcOutcomeInit,
@@ -82,9 +90,17 @@ def create_qc_outcome(
         db_qc_outcome.linked_annotation = DBAnnotation(
             entities=[entity], **annotation.dict()
         )
+    try:
+        db_session.merge(db_qc_outcome)
+        db_session.commit()
 
-    db_session.merge(db_qc_outcome)
-    db_session.commit()
+    except IntegrityError as e:
+        print(e)
+        raise HTTPException(
+            status_code=400,
+            detail="The new QC outcome violates a database constraint. "
+            "Most likely one of the fields provided is already present in the DB.",
+        )
 
 
 @router.post("/retrieve", response_model=List[QcOutcomeOut])
