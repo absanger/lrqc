@@ -1,37 +1,44 @@
-from typing import Dict, List
-from sqlalchemy import select
+from typing import List
 from fastapi import APIRouter, Depends
 
 from sqlalchemy.orm import Session
 from lrqc.lrqc_outcome.db.db_schema import (
-    Entity as DBEntity,
     Annotation as DBAnnotation,
 )
 
-from lrqc.lrqc_outcome.models import Annotation
+from lrqc.lrqc_outcome.models import Annotation, AnnotationOut, PacBioSearch
 from lrqc.lrqc_outcome.db.connection import get_lrqc_db
+from lrqc.lrqc_outcome.endpoints.misc import get_or_create, get_entities_pacbio
 
 router = APIRouter()
 
 
-@router.post("/retrieve", response_model=Dict[int, List[Annotation]])
+@router.post("/retrieve", response_model=List[AnnotationOut])
 def retrieve_annotations(
-    entity_ids: List[int], db_session: Session = Depends(get_lrqc_db)
-) -> Dict[int, List[Annotation]]:
+    search_terms: List[PacBioSearch], db_session: Session = Depends(get_lrqc_db)
+) -> List[AnnotationOut]:
     """Retrieve annotations for a list of entitiy ids"""
 
-    stmt = select(DBEntity).filter(DBEntity.id_entity.in_(entity_ids))
+    entities = get_entities_pacbio(search_terms, db_session)
+    output = []
+    for (terms, entity) in entities:
+        for db_annot in entity.annotations:
+            annot = AnnotationOut(
+                run_name=terms.run_name,
+                well_label=terms.well_label,
+                annotation=db_annot.annotation,
+                user_name=db_annot.user_name,
+                date_created=db_annot.date_created,
+            )
 
-    results = db_session.execute(stmt).scalars().all()
-
-    output = {entity.id_entity: entity.annotations for entity in results}
+            output.append(annot)
 
     return output
 
 
 @router.post("/create")
 def create_annotation(
-    entity_ids: List[int],
+    pacbio_entities: List[PacBioSearch],
     annotation: Annotation,
     db_session: Session = Depends(get_lrqc_db),
 ):
@@ -44,11 +51,8 @@ def create_annotation(
     """
 
     db_annotation: DBAnnotation = annotation.to_sqlalchemy()
-    entities = (
-        db_session.execute(select(DBEntity).filter(DBEntity.id_entity.in_(entity_ids)))
-        .scalars()
-        .all()
-    )
+
+    entities = [get_or_create(pacbio_ent, db_session) for pacbio_ent in pacbio_entities]
 
     db_annotation.entities = entities
 

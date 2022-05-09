@@ -90,6 +90,24 @@ class Annotation(BaseModel):
         return DBAnnotation(**self.dict())
 
 
+class AnnotationOut(Annotation):
+    run_name: str = Field(
+        default=None, title="PacBio run name", description="PacBio run name"
+    )
+    well_label: str = Field(
+        default=None, title="PacBio well label", description="PacBio well label"
+    )
+
+    class Config:
+        schema_extra = {
+            "example": Annotation.Config.schema_extra["example"]
+            | {
+                "run_name": "A1",
+                "well_label": "A2",
+            }
+        }
+
+
 class QcOutcomeInit(BaseModel):
 
     user_name: str = Field(
