@@ -21,7 +21,7 @@ class Entity(Base):
         "description strings",
     )
     description = Column(
-        String(),
+        String(64),
         comment="Description string (see 'pacbio_ent') or an ordered list of description strings",
     )
     json_ = Column(
@@ -44,11 +44,11 @@ class PacbioEnt(Base):
     __tablename__ = "pacbio_ent"
 
     id_pacbio_ent = Column(Integer, primary_key=True)
-    run_name = Column(String(), comment="Traction LIMS run name")
-    cell_label = Column(String(), nullable=True, comment="PacBio cell label")
-    tag1_sequence = Column(String(), nullable=True)
+    run_name = Column(String(64), comment="Traction LIMS run name")
+    cell_label = Column(String(64), nullable=True, comment="PacBio cell label")
+    tag1_sequence = Column(String(64), nullable=True)
     description = Column(
-        String(),
+        String(64),
         comment="A human-readable unique string listing the four attributes in the order they are"
         " presented here.",
     )
@@ -66,12 +66,12 @@ class EntityPacbioEnt(Base):
 
     id_entity_pacbio_ent = Column(Integer, primary_key=True)
     id_entity = Column(
-        String(), ForeignKey("entity.id_entity"), comment="Foreign key, see 'entity'"
+        Integer, ForeignKey("entity.id_entity"), comment="Foreign key, see entity"
     )
     id_pacbio_ent = Column(
-        String(),
+        Integer,
         ForeignKey("pacbio_ent.id_pacbio_ent"),
-        comment="Foreign key, see 'pacbio_ent'",
+        comment="Foreign key, see pacbio_ent",
     )
 
 
@@ -90,10 +90,12 @@ class QcOutcome(Base):
     date_created = Column(DateTime, server_default=func.now())
     date_updated = Column(DateTime, server_default=func.now(), onupdate=func.now())
     user_name = Column(
-        String(),
+        String(64),
         comment="Real logged user, the user running a script or an agent (a pipeline)",
     )
-    created_by = Column(String(), comment="Application or script name, RT ticket, etc.")
+    created_by = Column(
+        String(64), comment="Application or script name, RT ticket, etc."
+    )
 
     entity = relationship("Entity", back_populates="qc_outcome", uselist=False)
     qc_outcome_dict = relationship(
@@ -104,6 +106,7 @@ class QcOutcome(Base):
         secondary="entity_annotation",
         back_populates="linked_qc_outcome",
         uselist=False,
+        overlaps="annotations",
     )
 
 
@@ -111,8 +114,8 @@ class QcOutcomeDict(Base):
     __tablename__ = "qc_outcome_dict"
 
     id_qc_outcome_dict = Column(Integer, primary_key=True)
-    description = Column(String(), unique=True, comment="Short description")
-    long_description = Column(String(), comment="Long description")
+    description = Column(String(64), unique=True, comment="Short description")
+    long_description = Column(String(64), comment="Long description")
 
     qc_outcome = relationship(
         "QcOutcome", back_populates="qc_outcome_dict", uselist=False
@@ -128,7 +131,7 @@ class QcOutcomeHistory(Base):
     id_qc_outcome_history = Column(Integer, primary_key=True)
     # TODO: make foreign key
     id_entity = Column(
-        Integer, ForeignKey("entity.id_entity"), comment="Foreign key, see 'entity'"
+        Integer, ForeignKey("entity.id_entity"), comment="Foreign key, see entity"
     )
     # TODO: make foreign key
     id_qc_outcome_dict = Column(
@@ -139,10 +142,12 @@ class QcOutcomeHistory(Base):
     date_created = Column(DateTime, server_default=func.now())
     date_updated = Column(DateTime, server_default=func.now(), onupdate=func.now())
     user_name = Column(
-        String(),
+        String(64),
         comment="Real logged user, the user running a script or an agent (a pipeline)",
     )
-    created_by = Column(String(), comment="Application or script name, RT ticket, etc.")
+    created_by = Column(
+        String(64), comment="Application or script name, RT ticket, etc."
+    )
 
     entity = relationship("Entity", back_populates="qc_outcome_history", uselist=False)
     qc_outcome_dict = relationship(
@@ -154,9 +159,9 @@ class Annotation(Base):
     __tablename__ = "annotation"
 
     id_annotation = Column(Integer, primary_key=True)
-    annotation = Column(String(), comment="Long string")
+    annotation = Column(String(64), comment="Long string")
     user_name = Column(
-        String(),
+        String(64),
         comment="Real logged user the user running a script or an agent (a pipeline)",
     )
     date_created = Column(
@@ -166,13 +171,17 @@ class Annotation(Base):
     )
 
     entities = relationship(
-        "Entity", secondary="entity_annotation", back_populates="annotations"
+        "Entity",
+        secondary="entity_annotation",
+        back_populates="annotations",
+        overlaps="linked_annotation",
     )
     linked_qc_outcome = relationship(
         "QcOutcome",
         secondary="entity_annotation",
         back_populates="linked_annotation",
         uselist=False,
+        overlaps="annotations,entities",
     )
 
 
