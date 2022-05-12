@@ -9,11 +9,13 @@ from lrqc.mlwh.list import list_ten_recent_runs
 from lrqc.mlwh.connection import session_factory
 from lrqc.lrqc_outcome.router import router as lrqc_router
 from lrqc.mlwh.endpoints.inbox import router as inbox_router
+from lrqc.mlwh.router import router as mlwh_router
 
 
-app = FastAPI()
-app.include_router(lrqc_router)
+app = FastAPI(title="LRQC")
+app.include_router(lrqc_router, prefix="/qc")
 app.include_router(inbox_router)
+app.include_router(mlwh_router, prefix="/mlwh")
 
 
 def get_db():
@@ -27,6 +29,7 @@ def get_db():
 
 @app.get("/")
 async def root():
+    """Redirect from root to docs."""
     return RedirectResponse(url="/docs")
 
 
