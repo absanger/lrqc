@@ -1,7 +1,7 @@
 """Get run."""
 
 from typing import Optional
-from pytest import Session
+from sqlalchemy.orm import Session
 from ml_warehouse.schema import PacBioRunWellMetrics
 from sqlalchemy import select
 from lrqc.mlwh.models import PacBioRun
