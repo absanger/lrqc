@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from typing import List
 
 from fastapi import APIRouter, Depends
 from ml_warehouse.schema import PacBioRunWellMetrics
@@ -7,15 +6,13 @@ from sqlalchemy import select, and_, or_
 from sqlalchemy.orm import Session
 
 from lrqc.mlwh.connection import get_mlwh_db
-from lrqc.mlwh.models import PacBioRun
+from lrqc.mlwh.models import InboxResults
 
 router = APIRouter()
 
 
-@router.get("/inbox", response_model=List[PacBioRun])
-def get_inbox(
-    weeks: int, db_session: Session = Depends(get_mlwh_db)
-) -> List[PacBioRun]:
+@router.get("/inbox", response_model=InboxResults)
+def get_inbox(weeks: int, db_session: Session = Depends(get_mlwh_db)) -> InboxResults:
     """Get inbox of PacBio runs"""
 
     stmt = select(PacBioRunWellMetrics).filter(
@@ -37,6 +34,16 @@ def get_inbox(
         )
     )
 
-    print(len(db_session.execute(stmt).all()))
+    results = db_session.execute(stmt).scalars().all()
 
-    return db_session.execute(stmt).scalars().all()
+    output = {}
+    for res in results:
+        run_name = res.pac_bio_run_name
+        well_label = res.well_label
+
+        if run_name in output:
+            output[run_name].append(well_label)
+        else:
+            output[run_name] = [well_label]
+
+    return output

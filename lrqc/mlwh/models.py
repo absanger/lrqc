@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Any
+from typing import Any, Dict, List
 
 from pydantic import BaseModel, Field
 
@@ -21,6 +21,23 @@ class PacBioRun(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+RunName = str
+WellLabel = str
+
+
+class InboxResults(BaseModel):
+
+    __root__: Dict[RunName, List[WellLabel]]
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "MY-RUN-100": ["A1", "B1", "C1"],
+                "MY-RUN-101": ["A1", "B1", "D1"],
+            }
+        }
 
 
 class Study(BaseModel):
